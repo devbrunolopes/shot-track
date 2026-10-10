@@ -134,7 +134,11 @@ function normalizeInjections(items: Injection[]) {
       location: String(item.location || "Outro").trim() || "Outro",
       notes: String(item.notes || ""),
       brand: String(item.brand || getSubstancePreset(String(item.substance || "")).brand || "").trim(),
-      applicationType: item.applicationType === "subcutaneous" ? "subcutaneous" : "intramuscular",
+      applicationType: (
+        item.applicationType === "subcutaneous"
+          ? "subcutaneous"
+          : "intramuscular"
+      ) as ApplicationType,
       syringeGroupId: item.syringeGroupId ? String(item.syringeGroupId) : undefined
     }))
     .filter((item) => item.date);
@@ -150,7 +154,11 @@ function normalizePlans(items: ApplicationPlan[]) {
       brand: String(plan.brand || getSubstancePreset(String(plan.substance || "")).brand || "").trim(),
       concentration: Math.max(0, Number(plan.concentration) || 0),
       volume: Math.max(0, Number(plan.volume) || 0),
-      applicationType: plan.applicationType === "subcutaneous" ? "subcutaneous" : "intramuscular",
+      applicationType: (
+        plan.applicationType === "subcutaneous"
+          ? "subcutaneous"
+          : "intramuscular"
+      ) as ApplicationType,
       startDate: String(plan.startDate || "").slice(0, 10),
       frequencyType: plan.frequencyType === "weekdays" ? "weekdays" : "every_n_days",
       intervalDays: Math.max(1, Number(plan.intervalDays) || 1),
