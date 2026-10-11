@@ -1055,7 +1055,7 @@ body { background: #f4f7fc; color: #14213d; }
 .more-row { display:flex; justify-content:space-between; align-items:center; gap:12px; padding:12px 2px; border-bottom:1px solid #f0f3f8; font-size:13px; }
 .more-row-arrow { color:#9aa7ba; font-size:22px; }
 .more-note { margin-top:20px; border-radius:14px; padding:12px; background:#f4f7fc; color:#66758c; font-size:11px; line-height:1.5; }
-.mobile-tabbar { position:fixed; z-index:15; left:0; right:0; bottom:0; display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); padding:8px 8px calc(8px + env(safe-area-inset-bottom)); background:rgba(255,255,255,.96); border-top:1px solid #e3eaf4; backdrop-filter:blur(18px); box-shadow:0 -8px 24px rgba(20,40,75,.06); }
+.mobile-tabbar { position:fixed; z-index:15; left:0; right:0; bottom:0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); padding:8px 8px calc(8px + env(safe-area-inset-bottom)); background:rgba(255,255,255,.96); border-top:1px solid #e3eaf4; backdrop-filter:blur(18px); box-shadow:0 -8px 24px rgba(20,40,75,.06); }
 .mobile-tabbar button { display:flex; flex-direction:column; justify-content:center; align-items:center; gap:4px; min-width:0; min-height:48px; border:0; border-radius:12px; color:#8390a4; background:transparent; font-size:10px; font-weight:700; }
 .mobile-tabbar button.active { color:#2457e8; background:#edf3ff; }
 .mobile-tabbar button span { white-space:nowrap; }
@@ -1117,4 +1117,62 @@ body { background: #f4f7fc; color: #14213d; }
   .planned-card .compact { grid-column:1 / -1; }
   .selected-day-header { gap:12px; }
   .modal { max-height:calc(100dvh - env(safe-area-inset-top)); padding-bottom:calc(18px + env(safe-area-inset-bottom)); }
+}
+
+
+/* v1.7.2 — compact application records */
+.selected-day-list { display:flex; flex-direction:column; }
+.day-record {
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:15px 0;
+  border-top:1px solid var(--line);
+}
+.day-record-main { min-width:0; flex:1; }
+.day-record-title {
+  display:flex;
+  align-items:baseline;
+  gap:8px;
+  flex-wrap:wrap;
+  line-height:1.35;
+}
+.day-record-title .history-name { color:#14213d; font-size:14px; }
+.day-record-volume { color:#2457e8; font-size:12px; font-weight:700; white-space:nowrap; }
+.day-record-dose { color:#237747; font-size:12px; white-space:nowrap; }
+.day-record-meta {
+  display:flex;
+  align-items:center;
+  gap:5px 13px;
+  flex-wrap:wrap;
+  margin-top:5px;
+  color:#687890;
+  font-size:11px;
+}
+.day-record-meta span { display:inline-flex; align-items:center; gap:4px; white-space:nowrap; }
+.day-record-actions { flex:0 0 auto; flex-direction:column; gap:2px; }
+.day-record-actions .icon-button { width:34px; height:34px; }
+@media (max-width:520px) {
+  .day-record { gap:6px; align-items:center; }
+  .day-record-title { gap:5px 7px; }
+  .day-record-title .history-name { font-size:13px; }
+  .day-record-meta { gap:5px 9px; font-size:10px; }
+  .day-record-actions .icon-button { width:30px; height:30px; }
+}
+
+/* Calendar v1.7.3: compact weekly-first layout and centered status marks */
+.calendar-grid.week-view .calendar-cell { aspect-ratio: auto; height: 66px; }
+.calendar-grid.month-view .calendar-cell { aspect-ratio: 1 / 1; height: auto; }
+.calendar-day, .calendar-day.selected { display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:8px; padding:9px 0 0; }
+.calendar-date-number { display:block; line-height:1.1; }
+.calendar-marks { position:static; display:flex; align-items:center; justify-content:center; gap:4px; min-height:6px; margin-top:0; }
+.calendar-mark { position:static; display:block; width:5px; height:5px; min-width:5px; min-height:5px; padding:0; border-radius:50%; line-height:0; }
+.calendar-controls { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:12px; }
+.calendar-controls .calendar-legend { margin-top:0; }
+.calendar-expand-button { min-height:34px; padding:7px 11px; border-radius:10px; font-size:12px; display:inline-flex; align-items:center; gap:7px; white-space:nowrap; }
+.calendar-summary { margin-top:12px; }
+@media (max-width: 480px) {
+  .calendar-grid.week-view .calendar-cell { height:60px; }
+  .calendar-day, .calendar-day.selected { gap:7px; padding-top:9px; }
+  .calendar-controls { align-items:flex-start; flex-direction:column; }
 }
