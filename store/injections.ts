@@ -71,11 +71,14 @@ export type ApplicationPlan = {
   active: boolean;
 };
 
-type InjectionStore = {
+export type BackupData = {
   injections: Injection[];
   substances: string[];
   locations: string[];
   plans: ApplicationPlan[];
+};
+
+type InjectionStore = BackupData & {
   addInjection: (injection: Omit<Injection, "id">) => void;
   updateInjection: (
     id: string,
@@ -90,6 +93,9 @@ type InjectionStore = {
     plan: Omit<ApplicationPlan, "id">
   ) => void;
   removePlan: (id: string) => void;
+
+  // Substitui os dados atuais pelos dados de um backup.
+  replaceAllData: (data: BackupData) => void;
 };
 
 function normalizeList(
@@ -115,8 +121,6 @@ function normalizeList(
   return result;
 }
 
-// Listas antigas excluídas durante a migração.
-// Substâncias e locais personalizados são preservados.
 const LEGACY_DEFAULT_SUBSTANCES = [
   "Enantato de testosterona",
   "Cipionato de testosterona",
@@ -207,6 +211,7 @@ function normalizePlans(
     .map(
       (plan): ApplicationPlan => ({
         ...plan,
+        id: String(plan.id || crypto.randomUUID()),
         name: String(plan.name || "Plano").trim(),
         substance: String(plan.substance || "").trim(),
         brand: String(
@@ -328,6 +333,23 @@ export const useInjectionStore =
             plans: state.plans.filter(
               (item) => item.id !== id
             ),
+          })),
+
+        // Restauração dos dados do backup.
+        // A persistência do Zustand grava o novo estado
+        // automaticamente no localStorage.
+        replaceAllData: (data) =>
+          set(() => ({
+            injections: normalizeInjections(data.injections),
+            substances: normalizeList(
+              data.substances,
+              DEFAULT_SUBSTANCES
+            ),
+            locations: normalizeList(
+              data.locations,
+              DEFAULT_LOCATIONS
+            ),
+            plans: normalizePlans(data.plans),
           })),
       }),
       {
