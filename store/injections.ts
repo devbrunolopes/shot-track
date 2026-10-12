@@ -71,14 +71,19 @@ export type ApplicationPlan = {
   active: boolean;
 };
 
+export type SubstanceDetails = { brand: string; concentration: number; volume: number; applicationType: ApplicationType };
+
 export type BackupData = {
   injections: Injection[];
   substances: string[];
   locations: string[];
   plans: ApplicationPlan[];
+  substanceDetails?: Record<string, SubstanceDetails>;
 };
 
 type InjectionStore = BackupData & {
+  substanceDetails: Record<string, SubstanceDetails>;
+  updateSubstanceDetails: (name: string, details: SubstanceDetails) => void;
   addInjection: (injection: Omit<Injection, "id">) => void;
   updateInjection: (
     id: string,
@@ -86,7 +91,11 @@ type InjectionStore = BackupData & {
   ) => void;
   removeInjection: (id: string) => void;
   addSubstance: (name: string) => void;
+  renameSubstance: (oldName: string, newName: string) => void;
+  removeSubstance: (name: string) => void;
   addLocation: (name: string) => void;
+  renameLocation: (oldName: string, newName: string) => void;
+  removeLocation: (name: string) => void;
   addPlan: (plan: Omit<ApplicationPlan, "id">) => void;
   updatePlan: (
     id: string,
@@ -266,6 +275,10 @@ export const useInjectionStore =
         substances: DEFAULT_SUBSTANCES,
         locations: DEFAULT_LOCATIONS,
         plans: [],
+        substanceDetails: {},
+        updateSubstanceDetails: (name, details) => set((state) => ({
+          substanceDetails: { ...state.substanceDetails, [name]: details },
+        })),
 
         addInjection: (injection) =>
           set((state) => ({
@@ -302,12 +315,57 @@ export const useInjectionStore =
             ),
           })),
 
+        renameSubstance: (oldName, newName) =>
+          set((state) => {
+            const name = newName.trim();
+            const substanceDetails = { ...state.substanceDetails };
+            if (substanceDetails[oldName]) {
+              substanceDetails[name] = substanceDetails[oldName];
+              delete substanceDetails[oldName];
+            }
+            return {
+              substances: normalizeList(
+                state.substances.map((item) => item === oldName ? name : item),
+                DEFAULT_SUBSTANCES
+              ),
+              substanceDetails,
+              plans: state.plans.map((plan) => plan.substance === oldName ? { ...plan, substance: name } : plan),
+            };
+          }),
+
+        removeSubstance: (name) =>
+          set((state) => ({
+            substances: state.substances.filter((item) => item !== name),
+            plans: state.plans.filter((plan) => plan.substance !== name),
+          })),
+
         addLocation: (name) =>
           set((state) => ({
             locations: normalizeList(
               [...state.locations, name],
               DEFAULT_LOCATIONS
             ),
+          })),
+
+        renameLocation: (oldName, newName) =>
+          set((state) => ({
+            locations: normalizeList(
+              state.locations.map((name) => name === oldName ? newName.trim() : name),
+              DEFAULT_LOCATIONS
+            ),
+            plans: state.plans.map((plan) => ({
+              ...plan,
+              locationIds: plan.locationIds.map((location) => location === oldName ? newName.trim() : location),
+            })),
+          })),
+
+        removeLocation: (name) =>
+          set((state) => ({
+            locations: state.locations.filter((item) => item !== name),
+            plans: state.plans.map((plan) => ({
+              ...plan,
+              locationIds: plan.locationIds.filter((location) => location !== name),
+            })),
           })),
 
         addPlan: (plan) =>
@@ -350,6 +408,7 @@ export const useInjectionStore =
               DEFAULT_LOCATIONS
             ),
             plans: normalizePlans(data.plans),
+            substanceDetails: data.substanceDetails ?? {},
           })),
       }),
       {
@@ -375,6 +434,7 @@ export const useInjectionStore =
               LEGACY_DEFAULT_LOCATIONS
             ),
             plans: normalizePlans(state.plans ?? []),
+            substanceDetails: state.substanceDetails ?? {},
           };
         },
 
@@ -408,6 +468,7 @@ export const useInjectionStore =
             substances,
             locations,
             plans,
+            substanceDetails: state.substanceDetails ?? currentState.substanceDetails ?? {},
           };
         },
       }

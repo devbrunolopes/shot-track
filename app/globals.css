@@ -1194,3 +1194,32 @@ body { background: #f4f7fc; color: #14213d; }
   .backup-actions { display: grid; grid-template-columns: 1fr; margin-top: 16px; gap: 10px; }
   .backup-actions button { width: 100%; justify-content: center; }
 }
+
+
+/* Aba Mais: gerenciamento de substâncias e locais */
+.mobile-tabbar { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.more-page { display:flex; flex-direction:column; gap:16px; padding-bottom:24px; }
+.more-page-heading { margin:4px 0 2px; }
+.more-management-card { padding:18px; display:flex; flex-direction:column; gap:16px; }
+.more-management-heading { display:flex; align-items:center; gap:12px; }
+.more-management-heading h3 { margin:0 0 4px; font-size:16px; font-weight:800; }
+.more-management-icon { width:42px; height:42px; flex:0 0 42px; display:grid; place-items:center; border-radius:13px; background:#edf3ff; color:#2457e8; }
+.more-add-form { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:8px; align-items:center; }
+.more-add-form .input { min-width:0; }
+.more-managed-list { display:flex; flex-direction:column; }
+.more-managed-row { min-height:44px; display:flex; align-items:center; justify-content:space-between; gap:12px; border-top:1px solid #edf1f7; padding:10px 0; font-size:13px; }
+.more-default-label { flex-shrink:0; color:#7d8ba0; font-size:11px; background:#f3f6fb; padding:4px 7px; border-radius:99px; }
+.more-backup-card { margin:0; }
+.app-shell[data-view="more"] .home-stats,
+.app-shell[data-view="more"] .home-only,
+.app-shell[data-view="more"] .view-calendar,
+.app-shell[data-view="more"] .view-plans,
+.app-shell[data-view="more"] .view-history { display:none; }
+.app-shell[data-view="more"] .view-more { display:flex; }
+.app-shell[data-view="more"] .container { padding-bottom:110px; }
+@media (max-width:420px) { .more-add-form { grid-template-columns:1fr; } .more-add-form .primary-button { width:100%; justify-content:center; } .more-management-card { padding:14px; } }
+
+.more-row-actions { display:flex; align-items:center; gap:4px; flex-shrink:0; }
+.more-managed-main { min-width:0; flex:1; display:flex; align-items:center; flex-wrap:wrap; gap:8px; }
+.more-managed-main > span:first-child { min-width:0; overflow-wrap:anywhere; }
+.substance-brand-tag { flex-shrink:0; max-width:100%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#3157a6; font-size:11px; font-weight:650; background:#edf3ff; border:1px solid #dbe7ff; padding:3px 8px; border-radius:999px; }
