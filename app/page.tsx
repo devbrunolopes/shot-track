@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, Clock3, Filter, MapPin,
-  Pencil, Plus, Repeat2, Syringe, Tag, Trash2, X, History,
+  Pencil, Plus, Repeat2, Syringe, Tag, Trash2, X, History, Download, Upload, ShieldCheck,
 } from "lucide-react";
 import { getSubstancePreset, useInjectionStore, type ApplicationPlan, type ApplicationType, type Injection } from "@/store/injections";
 
@@ -47,12 +47,13 @@ function emptyPlan(substance = "", locationIds: string[] = []): PlanForm {
 }
 
 export default function Home() {
-  const { injections, substances, locations, plans, addInjection, updateInjection, removeInjection, addSubstance, addLocation, addPlan, updatePlan, removePlan } = useInjectionStore();
+  const { injections, substances, locations, plans, addInjection, updateInjection, removeInjection, addSubstance, addLocation, addPlan, updatePlan, removePlan, replaceAllData } = useInjectionStore();
   const [modalOpen, setModalOpen] = useState(false); const [editing, setEditing] = useState<Injection | null>(null); const [registrationPlan, setRegistrationPlan] = useState<ApplicationPlan | null>(null); const [deleteTarget, setDeleteTarget] = useState<Injection | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm()); const [addingSubstance, setAddingSubstance] = useState(false); const [newSubstance, setNewSubstance] = useState(""); const [addingLocation, setAddingLocation] = useState(false); const [newLocation, setNewLocation] = useState("");
   const [planModalOpen, setPlanModalOpen] = useState(false); const [addingPlanLocation, setAddingPlanLocation] = useState(false); const [newPlanLocation, setNewPlanLocation] = useState(""); const [editingPlan, setEditingPlan] = useState<ApplicationPlan | null>(null); const [planForm, setPlanForm] = useState<PlanForm>(emptyPlan()); const [deletePlanTarget, setDeletePlanTarget] = useState<ApplicationPlan | null>(null);
   const [calendarMonth, setCalendarMonth] = useState(() => { const d = new Date(); return new Date(d.getFullYear(), d.getMonth(), 1); }); const [selectedDate, setSelectedDate] = useState<string | null>(() => todayKey()); const [calendarExpanded, setCalendarExpanded] = useState(false);
   const [activeTab, setActiveTab] = useState<"calendar" | "plans" | "history">("calendar");
+  const backupInputRef = useRef<HTMLInputElement>(null); const [backupMessage, setBackupMessage] = useState(""); const [backupBusy, setBackupBusy] = useState(false);
   const [period, setPeriod] = useState<"7" | "30" | "90" | "all">("30"); const [substanceFilter, setSubstanceFilter] = useState("all"); const [locationFilter, setLocationFilter] = useState("all"); const [showFilters, setShowFilters] = useState(false);
 
   const calendarDays = useMemo(() => getCalendarDays(calendarMonth), [calendarMonth]);
@@ -66,6 +67,74 @@ export default function Home() {
   const selectedInjections = useMemo(() => selectedDate ? [...(injectionsByDate.get(selectedDate) || [])].sort((a,b) => b.date.localeCompare(a.date)) : [], [selectedDate, injectionsByDate]);
   const selectedPlans = useMemo(() => selectedDate ? plansByDate.get(selectedDate) || plans.filter(p => isPlannedOnDate(p, selectedDate)) : [], [selectedDate, plansByDate, plans]);
   const plannedForSelected = selectedPlans.filter(p => !selectedInjections.some(i => i.substance === p.substance));
+
+  function exportBackup() {
+    try {
+      const data = useInjectionStore.getState();
+      const backup = {
+        app: "Shot Track",
+        backupFormatVersion: 1,
+        exportedAt: new Date().toISOString(),
+        data: {
+          injections: data.injections,
+          substances: data.substances,
+          locations: data.locations,
+          plans: data.plans
+        }
+      };
+      const blob = new Blob([JSON.stringify(backup, null, 2)], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `shot-track-backup-${todayKey()}.json`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+      setBackupMessage("Backup exportado. Transfira esse arquivo para o celular e importe-o no Shot Track.");
+    } catch {
+      setBackupMessage("Não foi possível exportar o backup. Tente novamente.");
+    }
+  }
+
+  async function importBackup(file?: File) {
+    if (!file) return;
+    setBackupBusy(true);
+    setBackupMessage("");
+    try {
+      const parsed: unknown = JSON.parse(await file.text());
+      if (!parsed || typeof parsed !== "object") throw new Error("Arquivo inválido.");
+      const root = parsed as Record<string, unknown>;
+      if (root.app !== "Shot Track" || !root.data || typeof root.data !== "object") throw new Error("Este arquivo não parece ser um backup válido do Shot Track.");
+      const data = root.data as Record<string, unknown>;
+      if (!Array.isArray(data.injections) || !Array.isArray(data.substances) || !Array.isArray(data.locations) || !Array.isArray(data.plans)) {
+        throw new Error("O backup está incompleto ou em um formato não reconhecido.");
+      }
+      if (![...data.injections, ...data.plans].every(item => item !== null && typeof item === "object" && !Array.isArray(item)) ||
+          !data.substances.every(item => typeof item === "string") || !data.locations.every(item => typeof item === "string")) {
+        throw new Error("O arquivo contém dados inválidos. Nenhum dado atual foi alterado.");
+      }
+      const summary = `${data.injections.length} aplicação(ões), ${data.plans.length} plano(s), ${data.substances.length} substância(s) e ${data.locations.length} local(is)`;
+      const accepted = window.confirm(`Importar este backup?
+
+Conteúdo: ${summary}.
+
+A importação substituirá os dados atuais deste dispositivo. Recomendamos exportar um backup atual antes de continuar.`);
+      if (!accepted) return;
+      replaceAllData({
+        injections: data.injections as Injection[],
+        substances: data.substances as string[],
+        locations: data.locations as string[],
+        plans: data.plans as ApplicationPlan[]
+      });
+      setBackupMessage(`Backup importado com sucesso: ${summary}.`);
+    } catch (error) {
+      setBackupMessage(error instanceof Error ? error.message : "Não foi possível importar esse arquivo.");
+    } finally {
+      setBackupBusy(false);
+      if (backupInputRef.current) backupInputRef.current.value = "";
+    }
+  }
 
   function getSuggestedLocation(plan: ApplicationPlan, date: string) {
     const candidates = plan.locationIds.length ? plan.locationIds : locations;
@@ -103,7 +172,7 @@ export default function Home() {
     })[0];
   }
 
-  const calendarStats = useMemo(() => { const key = `${calendarMonth.getFullYear()}-${String(calendarMonth.getMonth()+1).padStart(2,"0")}`; const month = injections.filter(i=>i.date.startsWith(key)); return { count: month.length, volume: month.reduce((s,i)=>s+i.volume,0), days: new Set(month.map(i=>i.date)).size, planned: calendarDays.filter(d=>d.getMonth()===calendarMonth.getMonth() && plans.some(p=>isPlannedOnDate(p,localDateKey(d)))).length }; }, [injections, calendarMonth, calendarDays, plans]);
+  const calendarStats = useMemo(() => { const key = `${calendarMonth.getFullYear()}-${String(calendarMonth.getMonth()+1).padStart(2,"0")}`; const month = injections.filter(i=>i.date.startsWith(key)); return { count: month.length, volume: month.reduce((s,i)=>s+i.volume,0), days: new Set(month.map(i=>i.date)).size, planned: calendarDays.filter(d=>d.getMonth()===calendarMonth.getMonth() && plans.some(p=>isPlannedOnDate(p,localDateKey(d)) && !injections.some(i=>i.date===localDateKey(d) && i.substance===p.substance))).length }; }, [injections, calendarMonth, calendarDays, plans]);
   const filterSubstances = useMemo(() => [...new Set([...substances, ...injections.map(i=>i.substance.trim())].filter(Boolean))].sort(), [substances,injections]);
   const periodLabel = {"7":"7 dias","30":"30 dias","90":"90 dias",all:"Todo período"}[period];
   const cutoff = useMemo(() => { if(period==="all") return null; const d=new Date(); d.setHours(12,0,0,0); d.setDate(d.getDate()-(Number(period)-1)); return localDateKey(d); }, [period]);
@@ -189,7 +258,7 @@ export default function Home() {
     </section>
 
     <section className="card calendar-card view-calendar"><div className="calendar-header"><div><h2 className="section-title">Calendário</h2><p className="section-subtitle">Ver aplicações registradas e planejadas</p></div><div className="calendar-nav"><button className="icon-button" onClick={()=>changeMonth(-1)} aria-label="Período anterior"><ChevronLeft size={18}/></button><strong>{calendarExpanded ? monthTitle(calendarMonth) : (()=>{const days=displayCalendarDays;return days.length ? `${formatDate(localDateKey(days[0])).slice(0,5)} – ${formatDate(localDateKey(days[6])).slice(0,5)}` : monthTitle(calendarMonth)})()}</strong><button className="icon-button" onClick={()=>changeMonth(1)} aria-label="Próximo período"><ChevronRight size={18}/></button></div></div>
-      <div className="calendar-weekdays">{weekdayLabels.map(d=><span key={d}>{d}</span>)}</div><div className={`calendar-grid ${calendarExpanded ? "month-view" : "week-view"}`}>{displayCalendarDays.map(day=>{const key=localDateKey(day),isCurrent=!calendarExpanded||day.getMonth()===calendarMonth.getMonth(),isToday=key===todayKey(),isSelected=key===selectedDate,count=injectionsByDate.get(key)?.length||0,planned=plansByDate.get(key)?.length||0;return <div key={key} className="calendar-cell"><button type="button" className={`calendar-day ${!isCurrent?"outside":""} ${isToday?"today":""} ${isSelected?"selected":""}`} onClick={()=>{setSelectedDate(key);setCalendarMonth(new Date(day.getFullYear(),day.getMonth(),1));}} aria-label={`Selecionar ${formatDate(key)}`}><span className="calendar-date-number">{day.getDate()}</span><span className="calendar-marks">{count>0&&<span className="calendar-mark done" aria-label={`${count} realizadas`} />}{planned>0&&<span className="calendar-mark planned" aria-label={`${planned} planejadas`} />}</span></button></div>})}</div>
+      <div className="calendar-weekdays">{weekdayLabels.map(d=><span key={d}>{d}</span>)}</div><div className={`calendar-grid ${calendarExpanded ? "month-view" : "week-view"}`}>{displayCalendarDays.map(day=>{const key=localDateKey(day),isCurrent=!calendarExpanded||day.getMonth()===calendarMonth.getMonth(),isToday=key===todayKey(),isSelected=key===selectedDate,dayInjections=injectionsByDate.get(key)||[],count=dayInjections.length,planned=(plansByDate.get(key)||[]).filter(p=>!dayInjections.some(i=>i.substance===p.substance)).length;return <div key={key} className="calendar-cell"><button type="button" className={`calendar-day ${!isCurrent?"outside":""} ${isToday?"today":""} ${isSelected?"selected":""}`} onClick={()=>{setSelectedDate(key);setCalendarMonth(new Date(day.getFullYear(),day.getMonth(),1));}} aria-label={`Selecionar ${formatDate(key)}`}><span className="calendar-date-number">{day.getDate()}</span><span className="calendar-marks">{count>0&&<span className="calendar-mark done" aria-label={`${count} realizadas`} />}{planned>0&&<span className="calendar-mark planned" aria-label={`${planned} planejadas`} />}</span></button></div>})}</div>
       <div className="calendar-controls"><div className="calendar-legend"><span><i className="legend-dot done-dot"/> Realizada</span><span><i className="legend-dot planned-dot"/> Planejada</span></div><button className="secondary-button calendar-expand-button" onClick={()=>setCalendarExpanded(v=>!v)}>{calendarExpanded ? "Ver semana" : "Ver mês completo"} <CalendarDays size={15}/></button></div>{calendarExpanded&&<div className="calendar-summary"><span><strong>{calendarStats.count}</strong> aplicações</span><span><strong>{calendarStats.days}</strong> dias registrados</span><span><strong>{calendarStats.planned}</strong> dias planejados</span><span><strong>{formatNumber(calendarStats.volume)}</strong> mL</span></div>}
     </section>
 
@@ -201,6 +270,8 @@ export default function Home() {
     <section className="card plans-section view-plans"><div className="dashboard-heading"><div><h2 className="section-title">Planos de aplicações</h2><p className="section-subtitle">Organize datas previstas sem transformar o planejamento em registro realizado.</p></div><button className="secondary-button" onClick={openPlanCreate}><Plus size={16}/> Criar plano</button></div>{plans.length===0?<div className="empty small"><Repeat2 size={25}/><p>Nenhum plano criado. Você pode configurar uma frequência e os locais que participam do rodízio.</p></div>:<div className="plans-list">{plans.map(plan=><article className="plan-item" key={plan.id}><div className="plan-icon"><Repeat2 size={18}/></div><div className="plan-main"><div className="history-top"><strong>{plan.name}</strong><span className="badge">{plan.substance}</span></div><div className="history-meta"><span>Início: {formatDate(plan.startDate)}</span><span>{plan.frequencyType==="every_n_days"?`A cada ${plan.intervalDays} dias`:`Dias: ${plan.weekdays.map(d=>weekdayLabels[weekdayValues.indexOf(d)]).join(", ")}`}</span><span>{formatNumber(plan.concentration*plan.volume)} mg planejados</span><span>🏷️ {plan.brand || "Sem marca"}</span><span>{plan.applicationType === "subcutaneous" ? "Subcutânea" : "Intramuscular"}</span><span>{plan.locationIds.length} locais no rodízio</span></div></div><div className="history-actions"><button className="icon-button" onClick={()=>openPlanEdit(plan)} aria-label="Editar plano"><Pencil size={16}/></button><button className="icon-button delete" onClick={()=>setDeletePlanTarget(plan)} aria-label="Excluir plano"><Trash2 size={16}/></button></div></article>)}</div>}</section>
 
     <section className="dashboard-card card view-history"><div className="dashboard-heading"><div><h2 className="section-title">Aplicações</h2><p className="section-subtitle">Últimos 7 dias</p></div><span className="period-pill">{chartInjections.length} registros</span></div><div className="chart">{Array.from({length:7},(_,index)=>{const d=new Date();d.setHours(12,0,0,0);d.setDate(d.getDate()-(6-index));const key=localDateKey(d),value=chartInjections.filter(i=>i.date===key).length;const max=Math.max(...Array.from({length:7},(_,i)=>{const x=new Date();x.setHours(12,0,0,0);x.setDate(x.getDate()-(6-i));return chartInjections.filter(it=>it.date===localDateKey(x)).length}),1);return <div className="chart-column" key={key}><div className="chart-value">{value||""}</div><div className="chart-bar-wrap"><div className="chart-bar" style={{height:`${value?Math.max((value/max)*100,10):4}%`}}/></div><div className="chart-label">{new Intl.DateTimeFormat("pt-BR",{weekday:"short",day:"2-digit"}).format(d)}</div></div>})}</div></section>
+
+    <section className="card backup-tools view-history"><div className="dashboard-heading"><div><h2 className="section-title">Backup e transferência</h2><p className="section-subtitle">Exporte os dados deste dispositivo e importe-os em outro aparelho.</p></div><ShieldCheck size={22} className="backup-shield"/></div><div className="backup-actions"><button className="secondary-button" onClick={exportBackup}><Download size={16}/> Exportar backup</button><button className="primary-button" disabled={backupBusy} onClick={()=>backupInputRef.current?.click()}><Upload size={16}/> {backupBusy?"Importando...":"Importar backup"}</button><input ref={backupInputRef} type="file" accept=".json,application/json" className="backup-file-input" onChange={e=>void importBackup(e.target.files?.[0])}/></div><p className="helper-text">O arquivo contém aplicações, planos, substâncias e locais. A importação substitui os dados atuais deste aparelho após confirmação. Guarde o backup em um local privado.</p>{backupMessage&&<p className="backup-message" role="status">{backupMessage}</p>}</section>
 
     <section className="history view-history"><div className="history-heading"><div><h2 className="section-title">Histórico</h2><p className="section-subtitle">{filtered.length} {filtered.length===1?"registro":"registros"} exibidos</p></div><button className={`secondary-button filter-button ${substanceFilter!=="all"||locationFilter!=="all"||period!=="30"?"active":""}`} onClick={()=>setShowFilters(!showFilters)}><Filter size={16}/> Filtros</button></div>{showFilters&&<div className="card filters"><div className="filter-field"><label className="label">Período</label><select className="select" value={period} onChange={e=>setPeriod(e.target.value as typeof period)}><option value="7">Últimos 7 dias</option><option value="30">Últimos 30 dias</option><option value="90">Últimos 90 dias</option><option value="all">Todo período</option></select></div><div className="filter-field"><label className="label">Substância</label><select className="select" value={substanceFilter} onChange={e=>setSubstanceFilter(e.target.value)}><option value="all">Todas</option>{filterSubstances.map(s=><option key={s}>{s}</option>)}</select></div><div className="filter-field"><label className="label">Local</label><select className="select" value={locationFilter} onChange={e=>setLocationFilter(e.target.value)}><option value="all">Todos</option>{locations.map(l=><option key={l}>{l}</option>)}</select></div><button className="clear-filter" onClick={()=>{setPeriod("30");setSubstanceFilter("all");setLocationFilter("all")}}>Limpar filtros</button></div>}<div className="card">{filtered.length===0?<div className="empty"><Filter size={28}/><p>Nenhum registro encontrado com esses filtros.</p></div>:filtered.map(item=><article className="history-item" key={item.id}><div className="history-icon"><Syringe size={20}/></div><div className="history-main"><div className="history-top"><span className="history-name">{item.substance}</span>{item.syringeGroupId&&<span className="planned-badge">Mesma seringa</span>}<span className="badge">{formatNumber(item.volume)} mL</span></div><div className="history-meta"><span><CalendarDays size={13}/> {formatDate(item.date)}</span><span><MapPin size={13}/> {item.location}</span><span><Clock3 size={13}/> {formatNumber(item.concentration)} mg/mL</span><span>🏷️ {item.brand || "Sem marca"}</span><span>{item.applicationType === "subcutaneous" ? "Subcutânea" : "Intramuscular"}</span></div>{item.notes&&<div className="history-notes">{item.notes}</div>}</div><div className="history-dose">{formatNumber(item.concentration*item.volume)} mg</div><div className="history-actions"><button className="icon-button" onClick={()=>openEdit(item)} aria-label="Editar"><Pencil size={17}/></button><button className="icon-button delete" onClick={()=>setDeleteTarget(item)} aria-label="Excluir"><Trash2 size={17}/></button></div></article>)}</div></section>
 

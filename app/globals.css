@@ -1176,3 +1176,21 @@ body { background: #f4f7fc; color: #14213d; }
   .calendar-day, .calendar-day.selected { gap:7px; padding-top:9px; }
   .calendar-controls { align-items:flex-start; flex-direction:column; }
 }
+
+/* Backup and transfer controls */
+.backup-tools { margin: 0 0 24px; padding: 22px 24px; box-sizing: border-box; }
+.backup-tools .dashboard-heading { margin-bottom: 0; }
+.backup-tools .section-title { margin: 0 0 6px; }
+.backup-tools .section-subtitle { margin: 0; line-height: 1.5; }
+.backup-tools .backup-actions { margin: 18px 0 14px; gap: 12px; }
+.backup-tools .helper-text { margin: 0; line-height: 1.55; max-width: 900px; }
+.backup-tools .backup-message { margin-top: 14px; padding: 10px 12px; border-radius: 10px; background: var(--surface-secondary, #f5f7fb); }
+.backup-shield { color: var(--primary, #315be8); flex: 0 0 auto; }
+.backup-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 10px; }
+.backup-file-input { display: none; }
+.backup-message { margin: 10px 0 0; font-size: 0.875rem; color: var(--foreground, #243044); line-height: 1.45; }
+@media (max-width: 480px) {
+  .backup-tools { padding: 18px 16px; margin-bottom: 22px; }
+  .backup-actions { display: grid; grid-template-columns: 1fr; margin-top: 16px; gap: 10px; }
+  .backup-actions button { width: 100%; justify-content: center; }
+}

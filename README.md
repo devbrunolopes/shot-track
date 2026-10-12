@@ -23,3 +23,12 @@ npm run build
 ```
 
 Data remains in the browser's localStorage. This redesign does not migrate data or add cloud sync. Back up local data before changing browsers/devices.
+
+
+## Backup e transferência entre dispositivos (v1.8.0)
+
+Na aba **Histórico**, use **Exportar backup** no dispositivo de origem. O app baixa um arquivo `shot-track-backup-AAAA-MM-DD.json`. Transfira esse arquivo para o outro dispositivo (por cabo, AirDrop, Drive ou outro meio privado), abra o Shot Track nele e use **Importar backup**.
+
+A importação valida o formato e pede confirmação antes de substituir os dados locais atuais. Se o aparelho de destino já tiver registros, exporte primeiro um backup dele caso queira preservá-los. O arquivo inclui aplicações, planos, substâncias e locais; mantenha-o em local privado, pois contém dados pessoais.
+
+Este recurso transfere dados manualmente: não sincroniza automaticamente computador e celular.
