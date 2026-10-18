@@ -1317,3 +1317,43 @@ body { background: var(--background); color: var(--foreground); }
   transition: transform .18s ease;
 }
 .more-management-toggle .collapse-chevron.expanded { transform: rotate(180deg); }
+
+/* Firebase Authentication — identidade preto, dourado e marfim */
+.auth-shell { min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:24px 16px; background:radial-gradient(ellipse at top, #29251b 0%, #111111 54%, #090909 100%); color:#f5eedf; }
+.auth-card { width:100%; max-width:420px; border:1px solid rgba(198,164,92,.38); border-radius:24px; padding:30px; background:rgba(24,24,22,.97); box-shadow:0 24px 70px rgba(0,0,0,.42); }
+.auth-logo { display:block; width:76px; height:76px; object-fit:cover; border-radius:18px; border:1px solid #c6a45c; margin:0 auto 14px; }
+.auth-brand-title { text-align:center; font-weight:900; letter-spacing:.18em; font-size:18px; color:#d7b86b; }
+.auth-subtitle { margin:7px 0 26px; text-align:center; color:#a9a396; font-size:12px; }
+.auth-title { margin:0; font-size:23px; line-height:1.25; font-weight:800; letter-spacing:-.035em; color:#f5eedf; }
+.auth-description { margin:8px 0 22px; color:#b8b2a5; font-size:13px; line-height:1.5; }
+.auth-form { display:flex; flex-direction:column; gap:16px; }
+.auth-field { display:flex; flex-direction:column; gap:8px; color:#d9d0bc; font-size:12px; font-weight:700; }
+.auth-field > span { display:flex; align-items:center; gap:7px; }
+.auth-field input { width:100%; min-height:46px; border:1px solid #494437; border-radius:11px; padding:0 13px; background:#151513; color:#f5eedf; outline:none; font:inherit; font-size:14px; }
+.auth-field input:focus { border-color:#c6a45c; box-shadow:0 0 0 3px rgba(198,164,92,.13); }
+.auth-field input::placeholder { color:#777164; }
+.auth-submit { width:100%; min-height:47px; justify-content:center; margin-top:3px; background:#c6a45c; border-color:#c6a45c; color:#15130e; font-weight:800; }
+.auth-submit:disabled { opacity:.65; cursor:wait; }
+.auth-text-button { padding:0; border:0; background:transparent; color:#d7b86b; font:inherit; font-size:12px; font-weight:700; cursor:pointer; }
+.auth-text-button:disabled { opacity:.6; cursor:wait; }
+.auth-card > .auth-text-button { display:block; margin:17px auto 0; }
+.auth-switch { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:5px; margin-top:21px; padding-top:18px; border-top:1px solid #39352b; color:#b8b2a5; font-size:12px; }
+.auth-local-note { display:flex; align-items:flex-start; gap:7px; margin:20px 0 0; color:#928b7b; font-size:10px; line-height:1.5; }
+.auth-local-note svg { flex-shrink:0; color:#c6a45c; margin-top:1px; }
+.auth-message { border:1px solid rgba(220,95,85,.4); border-radius:10px; padding:10px 12px; background:rgba(130,40,35,.16); color:#ffc5bb; font-size:12px; line-height:1.5; }
+.auth-loading { display:flex; flex-direction:column; align-items:center; gap:14px; color:#b8b2a5; }
+.auth-loading .auth-logo { margin-bottom:0; }
+.auth-loading p { margin:0; font-size:13px; }
+.auth-spinner { width:23px; height:23px; border:2px solid #494437; border-top-color:#c6a45c; border-radius:50%; animation:auth-spin .8s linear infinite; }
+@keyframes auth-spin { to { transform:rotate(360deg); } }
+.signed-in-email { margin:3px 0 0; color:#928b7b; font-size:10px; }
+.auth-card { padding:25px 21px; border-radius:20px; }
+@media (max-width:620px) { .auth-title { font-size:21px; } .signed-in-email { overflow-wrap:anywhere; } }
+
+
+/* Conta e saída: ação disponível apenas no fim da aba Mais */
+.more-account-card { margin:0; padding:18px; display:flex; flex-direction:column; gap:14px; }
+.more-account-card .dashboard-heading { margin:0; }
+.more-signout-button { align-self:flex-start; border-color:#d8c58e; color:#4b3a10; }
+.more-signout-button:hover { background:#f3eddd; }
+@media (max-width:620px) { .more-signout-button { width:100%; justify-content:center; } }

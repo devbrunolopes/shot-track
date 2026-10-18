@@ -1,34 +1,33 @@
-# Shot Track v1.7.0 — Mobile-first
+# Shot Track v1.10.0
 
-Redesign mobile-first with a fixed bottom navigation and separate views for Home, Calendar, Plans, History and More.
+## Novidades
+- Login e cadastro com Firebase Authentication (e-mail e senha).
+- Recuperação de senha por e-mail.
+- Botão para sair da conta.
+- Identidade visual preto, dourado e marfim na tela de autenticação.
+- Os registros, planos, substâncias e locais continuam salvos localmente no dispositivo; login não ativa sincronização na nuvem.
 
-## Features retained
-- Local persistence through Zustand/localStorage
-- Injection history and application plans
-- Global location rotation suggestions
-- Brand and concentration presets
-- Intramuscular/subcutaneous application type
-- Multi-substance same-syringe recording flow
-- PWA manifest and service worker
+## Configuração Firebase
+O aplicativo Web está configurado para o projeto `shot-track-6266`. A configuração web do Firebase é pública; não inclua credenciais administrativas ou chaves privadas no cliente.
 
-## Run locally
+No Console do Firebase:
+1. Abra **Authentication → Settings → Authorized domains**.
+2. Confirme `localhost` para desenvolvimento.
+3. Adicione o domínio publicado do Shot Track, por exemplo `shot-track-three.vercel.app`, e qualquer domínio de produção personalizado utilizado.
+4. Em **Authentication → Sign-in method**, confirme que **E-mail/senha** está habilitado.
+
+## Executar localmente
+Requer Node.js compatível com Next.js 16 e conexão com a internet para instalar dependências.
+
 ```bash
 npm install
 npm run dev
 ```
 
-## Build
-```bash
-npm run build
-```
+Se estiver usando o ZIP para atualizar um repositório existente, preserve a pasta `.git`. Rode `npm install` para atualizar o `package-lock.json` com a dependência Firebase antes de publicar.
 
-Data remains in the browser's localStorage. This redesign does not migrate data or add cloud sync. Back up local data before changing browsers/devices.
-
-
-## Backup e transferência entre dispositivos (v1.8.0)
-
-Na aba **Histórico**, use **Exportar backup** no dispositivo de origem. O app baixa um arquivo `shot-track-backup-AAAA-MM-DD.json`. Transfira esse arquivo para o outro dispositivo (por cabo, AirDrop, Drive ou outro meio privado), abra o Shot Track nele e use **Importar backup**.
-
-A importação valida o formato e pede confirmação antes de substituir os dados locais atuais. Se o aparelho de destino já tiver registros, exporte primeiro um backup dele caso queira preservá-los. O arquivo inclui aplicações, planos, substâncias e locais; mantenha-o em local privado, pois contém dados pessoais.
-
-Este recurso transfere dados manualmente: não sincroniza automaticamente computador e celular.
+## Importante sobre os dados
+- O login controla quem consegue abrir a interface, mas não sincroniza registros entre dispositivos.
+- O logout não apaga os dados locais.
+- Os dados existentes do navegador/dispositivo permanecem no armazenamento local do Shot Track. Não limpe os dados do site nem o armazenamento do navegador durante a atualização.
+- A integração atual ainda não implementa licenças, códigos de ativação, banco Firestore ou sincronização em nuvem.

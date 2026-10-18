@@ -1,5 +1,5 @@
-const CACHE_NAME = "shot-track-shell-v1";
-const APP_SHELL = ["/", "/manifest.webmanifest", "/icon.svg"];
+const CACHE_NAME = "shot-track-shell-v2";
+const APP_SHELL = ["/", "/manifest.webmanifest", "/icons/shot-track-192.png", "/icons/shot-track-512.png", "/icons/shot-track-maskable-512.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).then(() => self.skipWaiting()));

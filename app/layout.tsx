@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "Registro pessoal de aplicações",
   applicationName: "Shot Track",
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Shot Track" },
-  icons: { icon: "/king-logo.jpg", apple: "/king-logo.jpg" },
+  icons: { icon: "/icons/shot-track-192.png", apple: "/icons/shot-track-192.png" },
   formatDetection: { telephone: false }
 };
 
