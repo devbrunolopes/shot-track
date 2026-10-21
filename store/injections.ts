@@ -64,6 +64,7 @@ export type ApplicationPlan = {
   volume: number;
   applicationType: ApplicationType;
   startDate: string;
+  endDate: string;
   frequencyType: "every_n_days" | "weekdays";
   intervalDays: number;
   weekdays: number[];
@@ -240,6 +241,7 @@ function normalizePlans(
             ? "subcutaneous"
             : "intramuscular",
         startDate: String(plan.startDate || "").slice(0, 10),
+        endDate: String(plan.endDate || "").slice(0, 10),
         frequencyType:
           plan.frequencyType === "weekdays"
             ? "weekdays"
