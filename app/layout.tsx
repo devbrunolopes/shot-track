@@ -4,7 +4,7 @@ import PwaRegister from "./pwa-register";
 
 export const metadata: Metadata = {
   title: "Diário Fitness",
-  description: "Registro pessoal de aplicações",
+  description: "Sua rotina. Sua evolução.",
   applicationName: "Diário Fitness",
   themeColor: "#C5A12B",
   appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Diário Fitness" },

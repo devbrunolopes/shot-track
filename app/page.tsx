@@ -2,11 +2,11 @@
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
-  Activity, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, Clock3, Droplet, Filter, MapPin, CircleDot,
+  Activity, UserRound, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, Clock3, Droplet, Filter, MapPin, CircleDot,
   Pencil, Plus, Repeat2, Syringe, Tag, Trash2, X, History, Download, Upload, ShieldCheck, MoreHorizontal, FlaskConical, MapPinned, LogOut, Mail, LockKeyhole, Sun, Moon,
 } from "lucide-react";
 import { getSubstancePreset, useInjectionStore, type ApplicationPlan, type ApplicationType, type Injection } from "@/store/injections";
-import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, type User } from "firebase/auth";
+import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, updateProfile, type User } from "firebase/auth";
 import { firebaseAuth } from "@/lib/firebase";
 
 type SyringeComponent = { planId: string; substance: string; brand: string; concentration: string; volume: string; applicationType: ApplicationType };
@@ -52,6 +52,7 @@ export default function Home() {
   const [authUser, setAuthUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+  const [authName, setAuthName] = useState("");
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authBusy, setAuthBusy] = useState(false);
@@ -93,8 +94,15 @@ export default function Home() {
   async function submitAuth(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setAuthMessage(""); setAuthBusy(true);
     try {
-      if (authMode === "signup") await createUserWithEmailAndPassword(firebaseAuth, authEmail.trim(), authPassword);
-      else await signInWithEmailAndPassword(firebaseAuth, authEmail.trim(), authPassword);
+      if (authMode === "signup") {
+        const name = authName.trim();
+        if (!name) { setAuthMessage("Informe seu nome para criar a conta."); return; }
+        const credential = await createUserWithEmailAndPassword(firebaseAuth, authEmail.trim(), authPassword);
+        await updateProfile(credential.user, { displayName: name });
+        setAuthUser(firebaseAuth.currentUser);
+      } else {
+        await signInWithEmailAndPassword(firebaseAuth, authEmail.trim(), authPassword);
+      }
     } catch (error) { setAuthMessage(authErrorMessage(error)); }
     finally { setAuthBusy(false); }
   }
@@ -329,10 +337,10 @@ A importação substituirá os dados atuais deste dispositivo. Recomendamos expo
 
   if (authLoading) return <main className="auth-shell"><section className="auth-card auth-loading"><img className="auth-logo" src="/icons/shot-track-192.png" alt="Logo Diário Fitness"/><div className="auth-spinner"/><p>Carregando sua conta…</p></section></main>;
 
-  if (!authUser) return <main className="auth-shell"><section className="auth-card"><img className="auth-logo" src="/icons/shot-track-192.png" alt="Logo Diário Fitness"/><div className="auth-brand-title">DIÁRIO FITNESS</div><p className="auth-subtitle">Seu diário pessoal de aplicações</p><h1 className="auth-title">{authMode === "login" ? "Entrar na sua conta" : "Criar sua conta"}</h1><p className="auth-description">{authMode === "login" ? "Acesse para continuar usando o Diário Fitness." : "Crie sua conta com e-mail e senha."}</p><form className="auth-form" onSubmit={submitAuth}><label className="auth-field"><span><Mail size={15}/> E-mail</span><input type="email" autoComplete="email" value={authEmail} onChange={e=>setAuthEmail(e.target.value)} placeholder="voce@exemplo.com" required/></label><label className="auth-field"><span><LockKeyhole size={15}/> Senha</span><input type="password" autoComplete={authMode === "login" ? "current-password" : "new-password"} value={authPassword} onChange={e=>setAuthPassword(e.target.value)} placeholder="Mínimo de 6 caracteres" minLength={6} required/></label>{authMessage && <div className="auth-message" role="alert">{authMessage}</div>}<button className="primary-button auth-submit" type="submit" disabled={authBusy}>{authBusy ? "Aguarde…" : authMode === "login" ? "Entrar" : "Criar conta"}</button></form>{authMode === "login" && <button className="auth-text-button" type="button" onClick={resetPassword} disabled={authBusy}>Esqueci minha senha</button>}<div className="auth-switch">{authMode === "login" ? "Ainda não tem uma conta?" : "Já tem uma conta?"}<button className="auth-text-button" type="button" onClick={()=>{setAuthMode(authMode === "login" ? "signup" : "login");setAuthMessage("");}}>{authMode === "login" ? "Criar conta" : "Entrar"}</button></div><p className="auth-local-note"><ShieldCheck size={14}/> Seus registros continuam armazenados neste dispositivo. O login não sincroniza aplicações entre aparelhos.</p></section></main>;
+  if (!authUser) return <main className="auth-shell"><section className="auth-card"><img className="auth-logo" src="/icons/shot-track-192.png" alt="Logo Diário Fitness"/><div className="auth-brand-title">DIÁRIO FITNESS</div><p className="auth-subtitle">Sua rotina. Sua evolução.</p><h1 className="auth-title">{authMode === "login" ? "Entrar na sua conta" : "Criar sua conta"}</h1><p className="auth-description">{authMode === "login" ? "Acesse para continuar usando o Diário Fitness." : "Crie sua conta com e-mail e senha."}</p><form className="auth-form" onSubmit={submitAuth}>{authMode === "signup" && <label className="auth-field"><span><UserRound size={15}/> Nome</span><input type="text" autoComplete="name" value={authName} onChange={e=>setAuthName(e.target.value)} placeholder="Como podemos chamar você?" maxLength={80} required/></label>}<label className="auth-field"><span><Mail size={15}/> E-mail</span><input type="email" autoComplete="email" value={authEmail} onChange={e=>setAuthEmail(e.target.value)} placeholder="voce@exemplo.com" required/></label><label className="auth-field"><span><LockKeyhole size={15}/> Senha</span><input type="password" autoComplete={authMode === "login" ? "current-password" : "new-password"} value={authPassword} onChange={e=>setAuthPassword(e.target.value)} placeholder="Mínimo de 6 caracteres" minLength={6} required/></label>{authMessage && <div className="auth-message" role="alert">{authMessage}</div>}<button className="primary-button auth-submit" type="submit" disabled={authBusy}>{authBusy ? "Aguarde…" : authMode === "login" ? "Entrar" : "Criar conta"}</button></form>{authMode === "login" && <button className="auth-text-button" type="button" onClick={resetPassword} disabled={authBusy}>Esqueci minha senha</button>}<div className="auth-switch">{authMode === "login" ? "Ainda não tem uma conta?" : "Já tem uma conta?"}<button className="auth-text-button" type="button" onClick={()=>{setAuthMode(authMode === "login" ? "signup" : "login");setAuthMessage("");}}>{authMode === "login" ? "Criar conta" : "Entrar"}</button></div><p className="auth-local-note"><ShieldCheck size={14}/> Seus registros continuam armazenados neste dispositivo. O login não sincroniza aplicações entre aparelhos.</p></section></main>;
 
   return <main className="app-shell" data-view={activeTab}><div className="container">
-    <header className="header"><div className="brand"><img className="brand-mark" src="/icons/shot-track-192.png" alt="Logo Diário Fitness" /><div><h1 className="brand-title">DIÁRIO FITNESS</h1><p className="brand-subtitle">Registro pessoal de aplicações</p><p className="signed-in-email">{authUser.email}</p></div></div></header>
+    <header className="header"><div className="brand"><img className="brand-mark" src="/icons/shot-track-192.png" alt="Logo Diário Fitness" /><div><h1 className="brand-title">DIÁRIO FITNESS</h1><p className="brand-subtitle">Sua rotina. Sua evolução.</p><p className="signed-in-email">Olá, {authUser.displayName?.trim() || authUser.email?.split("@")[0] || "usuário"}. Seja bem-vindo.</p></div></div></header>
 
     <section className="stats home-stats"><div className="card stat-card"><div className="stat-label">Última aplicação</div><div className="stat-value">{stats.lastDate?formatDate(stats.lastDate):"—"}</div></div><div className="card stat-card"><div className="stat-label">Volume · {periodLabel}</div><div className="stat-value">{formatNumber(stats.volume)} mL</div></div><div className="card stat-card"><div className="stat-label">Aplicações · {periodLabel}</div><div className="stat-value">{stats.count}</div></div><div className="card stat-card"><div className="stat-label">Dose registrada · {periodLabel}</div><div className="stat-value">{formatNumber(stats.doses)} mg</div></div></section>
 
@@ -347,7 +355,7 @@ A importação substituirá os dados atuais deste dispositivo. Recomendamos expo
     </section>
 
     <section className="advertisement-banner" aria-label="Publicidade">
-      <a href="#" className="advertisement-banner-link" aria-label="Publicidade King Shape" onClick={(event) => event.preventDefault()}>
+      <a href="https://kingshape.fit/" className="advertisement-banner-link" aria-label="Conheça a King Shape" target="_blank" rel="noopener noreferrer">
         <img src="/king-shape-banner.webp" alt="King Shape — Força, foco e evolução" />
       </a>
       <span className="advertisement-label">Publicidade</span>

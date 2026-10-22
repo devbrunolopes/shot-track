@@ -1,4 +1,4 @@
-const CACHE_NAME = "shot-v1.12.1";
+const CACHE_NAME = "shot-v1.14.0";
 const APP_SHELL = ["/", "/manifest.webmanifest", "/icons/shot-track-192.png", "/icons/shot-track-512.png", "/icons/shot-track-maskable-512.png"];
 
 self.addEventListener("install", (event) => {

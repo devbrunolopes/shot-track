@@ -6,3 +6,9 @@
 - Mantidos login, dados locais e funcionalidades existentes. Sem Stripe.
 
 Executar: `npm install` e `npm run dev`.
+
+## Versão 1.14.0
+- Banner King Shape atualizado com a arte aprovada pelo cliente e link para https://kingshape.fit/.
+- Campo de nome no cadastro de conta Firebase.
+- Saudação personalizada após o login.
+- Texto institucional atualizado para “Sua rotina. Sua evolução.”

@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     id: "/",
     name: "Diário Fitness",
     short_name: "Diário Fitness",
-    description: "Seu diário pessoal de aplicações e planos.",
+    description: "Acompanhe sua rotina e evolução fitness.",
     start_url: "/",
     scope: "/",
     display: "standalone",
