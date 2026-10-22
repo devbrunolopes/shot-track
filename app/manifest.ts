@@ -3,15 +3,15 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "Shot Track",
-    short_name: "Shot Track",
-    description: "Registro pessoal de aplicações e planos.",
+    name: "Diário Fitness",
+    short_name: "Diário Fitness",
+    description: "Seu diário pessoal de aplicações e planos.",
     start_url: "/",
     scope: "/",
     display: "standalone",
     orientation: "portrait-primary",
-    background_color: "#0B1220",
-    theme_color: "#2563EB",
+    background_color: "#FFFFFF",
+    theme_color: "#C5A12B",
     lang: "pt-BR",
     categories: ["health", "utilities"],
     icons: [

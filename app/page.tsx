@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   Activity, CalendarDays, CheckCircle2, ChevronLeft, ChevronRight, ChevronDown, Clock3, Droplet, Filter, MapPin, CircleDot,
-  Pencil, Plus, Repeat2, Syringe, Tag, Trash2, X, History, Download, Upload, ShieldCheck, MoreHorizontal, FlaskConical, MapPinned, LogOut, Mail, LockKeyhole,
+  Pencil, Plus, Repeat2, Syringe, Tag, Trash2, X, History, Download, Upload, ShieldCheck, MoreHorizontal, FlaskConical, MapPinned, LogOut, Mail, LockKeyhole, Sun, Moon,
 } from "lucide-react";
 import { getSubstancePreset, useInjectionStore, type ApplicationPlan, type ApplicationType, type Injection } from "@/store/injections";
 import { onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, sendPasswordResetEmail, signOut, type User } from "firebase/auth";
@@ -56,6 +56,20 @@ export default function Home() {
   const [authPassword, setAuthPassword] = useState("");
   const [authBusy, setAuthBusy] = useState(false);
   const [authMessage, setAuthMessage] = useState("");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [themeLoaded, setThemeLoaded] = useState(false);
+  useEffect(() => {
+    const saved = window.localStorage.getItem("diario-fitness-theme");
+    const initial = saved === "dark" ? "dark" : "light";
+    setTheme(initial);
+    document.documentElement.dataset.theme = initial;
+    setThemeLoaded(true);
+  }, []);
+  useEffect(() => {
+    if (!themeLoaded) return;
+    document.documentElement.dataset.theme = theme;
+    window.localStorage.setItem("diario-fitness-theme", theme);
+  }, [theme, themeLoaded]);
   useEffect(() => onAuthStateChanged(firebaseAuth, user => { setAuthUser(user); setAuthLoading(false); }), []);
 
   function authErrorMessage(error: unknown) {
@@ -125,7 +139,7 @@ export default function Home() {
     try {
       const data = useInjectionStore.getState();
       const backup = {
-        app: "Shot Track",
+        app: "Diário Fitness",
         backupFormatVersion: 1,
         exportedAt: new Date().toISOString(),
         data: {
@@ -313,12 +327,12 @@ A importação substituirá os dados atuais deste dispositivo. Recomendamos expo
     ? `${selectedPlans.length} planejada${selectedPlans.length === 1 ? "" : "s"}`
     : "sem aplicação planejada";
 
-  if (authLoading) return <main className="auth-shell"><section className="auth-card auth-loading"><img className="auth-logo" src="/icons/shot-track-192.png" alt="Logo Shot Track"/><div className="auth-spinner"/><p>Carregando sua conta…</p></section></main>;
+  if (authLoading) return <main className="auth-shell"><section className="auth-card auth-loading"><img className="auth-logo" src="/icons/shot-track-192.png" alt="Logo Diário Fitness"/><div className="auth-spinner"/><p>Carregando sua conta…</p></section></main>;
 
-  if (!authUser) return <main className="auth-shell"><section className="auth-card"><img className="auth-logo" src="/icons/shot-track-192.png" alt="Logo Shot Track"/><div className="auth-brand-title">SHOT TRACK</div><p className="auth-subtitle">Seu registro pessoal de aplicações</p><h1 className="auth-title">{authMode === "login" ? "Entrar na sua conta" : "Criar sua conta"}</h1><p className="auth-description">{authMode === "login" ? "Acesse para continuar usando o Shot Track." : "Crie sua conta com e-mail e senha."}</p><form className="auth-form" onSubmit={submitAuth}><label className="auth-field"><span><Mail size={15}/> E-mail</span><input type="email" autoComplete="email" value={authEmail} onChange={e=>setAuthEmail(e.target.value)} placeholder="voce@exemplo.com" required/></label><label className="auth-field"><span><LockKeyhole size={15}/> Senha</span><input type="password" autoComplete={authMode === "login" ? "current-password" : "new-password"} value={authPassword} onChange={e=>setAuthPassword(e.target.value)} placeholder="Mínimo de 6 caracteres" minLength={6} required/></label>{authMessage && <div className="auth-message" role="alert">{authMessage}</div>}<button className="primary-button auth-submit" type="submit" disabled={authBusy}>{authBusy ? "Aguarde…" : authMode === "login" ? "Entrar" : "Criar conta"}</button></form>{authMode === "login" && <button className="auth-text-button" type="button" onClick={resetPassword} disabled={authBusy}>Esqueci minha senha</button>}<div className="auth-switch">{authMode === "login" ? "Ainda não tem uma conta?" : "Já tem uma conta?"}<button className="auth-text-button" type="button" onClick={()=>{setAuthMode(authMode === "login" ? "signup" : "login");setAuthMessage("");}}>{authMode === "login" ? "Criar conta" : "Entrar"}</button></div><p className="auth-local-note"><ShieldCheck size={14}/> Seus registros continuam armazenados neste dispositivo. O login não sincroniza aplicações entre aparelhos.</p></section></main>;
+  if (!authUser) return <main className="auth-shell"><section className="auth-card"><img className="auth-logo" src="/icons/shot-track-192.png" alt="Logo Diário Fitness"/><div className="auth-brand-title">DIÁRIO FITNESS</div><p className="auth-subtitle">Seu diário pessoal de aplicações</p><h1 className="auth-title">{authMode === "login" ? "Entrar na sua conta" : "Criar sua conta"}</h1><p className="auth-description">{authMode === "login" ? "Acesse para continuar usando o Diário Fitness." : "Crie sua conta com e-mail e senha."}</p><form className="auth-form" onSubmit={submitAuth}><label className="auth-field"><span><Mail size={15}/> E-mail</span><input type="email" autoComplete="email" value={authEmail} onChange={e=>setAuthEmail(e.target.value)} placeholder="voce@exemplo.com" required/></label><label className="auth-field"><span><LockKeyhole size={15}/> Senha</span><input type="password" autoComplete={authMode === "login" ? "current-password" : "new-password"} value={authPassword} onChange={e=>setAuthPassword(e.target.value)} placeholder="Mínimo de 6 caracteres" minLength={6} required/></label>{authMessage && <div className="auth-message" role="alert">{authMessage}</div>}<button className="primary-button auth-submit" type="submit" disabled={authBusy}>{authBusy ? "Aguarde…" : authMode === "login" ? "Entrar" : "Criar conta"}</button></form>{authMode === "login" && <button className="auth-text-button" type="button" onClick={resetPassword} disabled={authBusy}>Esqueci minha senha</button>}<div className="auth-switch">{authMode === "login" ? "Ainda não tem uma conta?" : "Já tem uma conta?"}<button className="auth-text-button" type="button" onClick={()=>{setAuthMode(authMode === "login" ? "signup" : "login");setAuthMessage("");}}>{authMode === "login" ? "Criar conta" : "Entrar"}</button></div><p className="auth-local-note"><ShieldCheck size={14}/> Seus registros continuam armazenados neste dispositivo. O login não sincroniza aplicações entre aparelhos.</p></section></main>;
 
   return <main className="app-shell" data-view={activeTab}><div className="container">
-    <header className="header"><div className="brand"><img className="brand-mark" src="/icons/shot-track-192.png" alt="Logo Shot Track" /><div><h1 className="brand-title">SHOT TRACK</h1><p className="brand-subtitle">Registro pessoal de aplicações</p><p className="signed-in-email">{authUser.email}</p></div></div></header>
+    <header className="header"><div className="brand"><img className="brand-mark" src="/icons/shot-track-192.png" alt="Logo Diário Fitness" /><div><h1 className="brand-title">DIÁRIO FITNESS</h1><p className="brand-subtitle">Registro pessoal de aplicações</p><p className="signed-in-email">{authUser.email}</p></div></div></header>
 
     <section className="stats home-stats"><div className="card stat-card"><div className="stat-label">Última aplicação</div><div className="stat-value">{stats.lastDate?formatDate(stats.lastDate):"—"}</div></div><div className="card stat-card"><div className="stat-label">Volume · {periodLabel}</div><div className="stat-value">{formatNumber(stats.volume)} mL</div></div><div className="card stat-card"><div className="stat-label">Aplicações · {periodLabel}</div><div className="stat-value">{stats.count}</div></div><div className="card stat-card"><div className="stat-label">Dose registrada · {periodLabel}</div><div className="stat-value">{formatNumber(stats.doses)} mg</div></div></section>
 
@@ -330,6 +344,13 @@ A importação substituirá os dados atuais deste dispositivo. Recomendamos expo
     <section className="card calendar-card view-calendar"><div className="calendar-header"><div><h2 className="section-title">Calendário</h2><p className="section-subtitle">Ver aplicações registradas e planejadas</p></div><div className="calendar-nav"><button className="icon-button" onClick={()=>changeMonth(-1)} aria-label="Período anterior"><ChevronLeft size={18}/></button><strong>{calendarExpanded ? monthTitle(calendarMonth) : (()=>{const days=displayCalendarDays;return days.length ? `${formatDate(localDateKey(days[0])).slice(0,5)} – ${formatDate(localDateKey(days[6])).slice(0,5)}` : monthTitle(calendarMonth)})()}</strong><button className="icon-button" onClick={()=>changeMonth(1)} aria-label="Próximo período"><ChevronRight size={18}/></button></div></div>
       <div className="calendar-weekdays">{weekdayLabels.map(d=><span key={d}>{d}</span>)}</div><div className={`calendar-grid ${calendarExpanded ? "month-view" : "week-view"}`}>{displayCalendarDays.map(day=>{const key=localDateKey(day),isCurrent=!calendarExpanded||day.getMonth()===calendarMonth.getMonth(),isToday=key===todayKey(),isSelected=key===selectedDate,dayInjections=injectionsByDate.get(key)||[],count=dayInjections.length,planned=(plansByDate.get(key)||[]).filter(p=>!dayInjections.some(i=>i.substance===p.substance)).length;return <div key={key} className="calendar-cell"><button type="button" className={`calendar-day ${!isCurrent?"outside":""} ${isToday?"today":""} ${isSelected?"selected":""}`} onClick={()=>{setSelectedDate(key);setCalendarMonth(new Date(day.getFullYear(),day.getMonth(),1));}} aria-label={`Selecionar ${formatDate(key)}`}><span className="calendar-date-number">{day.getDate()}</span><span className="calendar-marks">{count>0&&<span className="calendar-mark done" aria-label={`${count} realizadas`} />}{planned>0&&<span className="calendar-mark planned" aria-label={`${planned} planejadas`} />}</span></button></div>})}</div>
       <div className="calendar-controls"><div className="calendar-legend"><span><i className="legend-dot done-dot"/> Realizada</span><span><i className="legend-dot planned-dot"/> Planejada</span></div><button className="secondary-button calendar-expand-button" onClick={()=>setCalendarExpanded(v=>!v)}>{calendarExpanded ? "Ver semana" : "Ver mês completo"} <CalendarDays size={15}/></button></div>{calendarExpanded&&<div className="calendar-summary"><span><strong>{calendarStats.count}</strong> aplicações</span><span><strong>{calendarStats.days}</strong> dias registrados</span><span><strong>{calendarStats.planned}</strong> dias planejados</span><span><strong>{formatNumber(calendarStats.volume)}</strong> mL</span></div>}
+    </section>
+
+    <section className="advertisement-banner" aria-label="Publicidade">
+      <a href="#" className="advertisement-banner-link" aria-label="Publicidade King Shape" onClick={(event) => event.preventDefault()}>
+        <img src="/king-shape-banner.webp" alt="King Shape — Força, foco e evolução" />
+      </a>
+      <span className="advertisement-label">Publicidade</span>
     </section>
 
     {selectedDate&&<section className="selected-day card view-calendar"><div className="selected-day-header"><div><h2 className="section-title">{selectedDate===todayKey()?`Hoje · ${formatDate(selectedDate)}`:formatDate(selectedDate)}</h2><p className="section-subtitle">{selectedSummary}: {plannedSummary}</p></div><button className="primary-button" onClick={()=>openCreate(selectedDate)}><Plus size={16}/> Registrar neste dia</button></div>
@@ -346,6 +367,10 @@ A importação substituirá os dados atuais deste dispositivo. Recomendamos expo
 
     <section className="view-more more-page">
       <div className="more-page-heading"><h2 className="section-title">Mais</h2><p className="section-subtitle">Gerencie as opções usadas nos registros e nos planos.</p></div>
+      <section className="card theme-settings-card">
+        <div className="theme-settings-copy"><div className="more-management-icon">{theme === "light" ? <Sun size={20}/> : <Moon size={20}/>}</div><div><h3>Aparência</h3><p className="section-subtitle">Escolha entre o modo claro e o modo escuro.</p></div></div>
+        <div className="theme-choice-row"><button type="button" className={`theme-choice ${theme === "light" ? "selected" : ""}`} aria-pressed={theme === "light"} onClick={() => setTheme("light")}><Sun size={17}/> Claro</button><button type="button" className={`theme-choice ${theme === "dark" ? "selected" : ""}`} aria-pressed={theme === "dark"} onClick={() => setTheme("dark")}><Moon size={17}/> Escuro</button></div>
+      </section>
       {moreMessage && <p className="backup-message" role="status">{moreMessage}</p>}
       <section className="card more-management-card">
         <button type="button" className="more-management-heading more-management-toggle" aria-expanded={substancesExpanded} onClick={()=>setSubstancesExpanded(v=>!v)}><div className="more-management-icon"><FlaskConical size={20}/></div><div className="more-management-title"><h3>Substâncias</h3><p className="section-subtitle">Adicione substâncias personalizadas para usar nos registros e planos.</p></div><ChevronDown className={`collapse-chevron ${substancesExpanded?"expanded":""}`} size={20}/></button>

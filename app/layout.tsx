@@ -3,11 +3,11 @@ import "./globals.css";
 import PwaRegister from "./pwa-register";
 
 export const metadata: Metadata = {
-  title: "Shot Track",
+  title: "Diário Fitness",
   description: "Registro pessoal de aplicações",
-  applicationName: "Shot Track",
-  themeColor: "#2563EB",
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Shot Track" },
+  applicationName: "Diário Fitness",
+  themeColor: "#C5A12B",
+  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Diário Fitness" },
   icons: { icon: "/icons/shot-track-192.png", apple: "/icons/shot-track-192.png" },
   formatDetection: { telephone: false }
 };
