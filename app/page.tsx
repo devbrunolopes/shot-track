@@ -125,6 +125,7 @@ export default function Home() {
   const [moreSubstanceInput, setMoreSubstanceInput] = useState(""); const [moreLocationInput, setMoreLocationInput] = useState(""); const [moreMessage, setMoreMessage] = useState("");
   const [substancesExpanded, setSubstancesExpanded] = useState(true);
   const [locationsExpanded, setLocationsExpanded] = useState(true);
+  const [backupExpanded, setBackupExpanded] = useState(true);
   const [editingSubstanceName, setEditingSubstanceName] = useState<string | null>(null); const [creatingSubstance, setCreatingSubstance] = useState(false); const [locationModalOpen, setLocationModalOpen] = useState(false); const [editingLocationName, setEditingLocationName] = useState<string | null>(null); const [locationEditor, setLocationEditor] = useState("");
   const [substanceEditor, setSubstanceEditor] = useState({ name: "", concentration: "", volume: "" });
   const presetFor = (name: string) => ({ ...getSubstancePreset(name), ...(substanceDetails[name] || {}) });
@@ -375,10 +376,6 @@ A importação substituirá os dados atuais deste dispositivo. Recomendamos expo
 
     <section className="view-more more-page">
       <div className="more-page-heading"><h2 className="section-title">Mais</h2><p className="section-subtitle">Gerencie as opções usadas nos registros e nos planos.</p></div>
-      <section className="card theme-settings-card">
-        <div className="theme-settings-copy"><div className="more-management-icon">{theme === "light" ? <Sun size={20}/> : <Moon size={20}/>}</div><div><h3>Aparência</h3><p className="section-subtitle">Escolha entre o modo claro e o modo escuro.</p></div></div>
-        <div className="theme-choice-row"><button type="button" className={`theme-choice ${theme === "light" ? "selected" : ""}`} aria-pressed={theme === "light"} onClick={() => setTheme("light")}><Sun size={17}/> Claro</button><button type="button" className={`theme-choice ${theme === "dark" ? "selected" : ""}`} aria-pressed={theme === "dark"} onClick={() => setTheme("dark")}><Moon size={17}/> Escuro</button></div>
-      </section>
       {moreMessage && <p className="backup-message" role="status">{moreMessage}</p>}
       <section className="card more-management-card">
         <button type="button" className="more-management-heading more-management-toggle" aria-expanded={substancesExpanded} onClick={()=>setSubstancesExpanded(v=>!v)}><div className="more-management-icon"><FlaskConical size={20}/></div><div className="more-management-title"><h3>Substâncias</h3><p className="section-subtitle">Adicione substâncias personalizadas para usar nos registros e planos.</p></div><ChevronDown className={`collapse-chevron ${substancesExpanded?"expanded":""}`} size={20}/></button>
@@ -390,7 +387,23 @@ A importação substituirá os dados atuais deste dispositivo. Recomendamos expo
         <div className="more-add-form"><button className="primary-button" type="button" onClick={()=>{setEditingLocationName(null);setLocationEditor("");setLocationModalOpen(true);setMoreMessage("");}}><Plus size={16}/> Adicionar local</button></div>
         {locationsExpanded && <div className="more-managed-list">{[...locations].sort((a,b)=>a.localeCompare(b,"pt-BR",{sensitivity:"base"})).map(item=><div className="more-managed-row" key={item}><span>{item}</span><div className="more-row-actions"><button className="icon-button" aria-label={`Editar ${item}`} onClick={()=>{setEditingLocationName(item);setLocationEditor(item);setLocationModalOpen(true);setMoreMessage("");}}><Pencil size={15}/></button></div></div>)}</div>}
       </section>
-      <section className="card backup-tools more-backup-card"><div className="dashboard-heading"><div><h3>Backup e transferência</h3><p className="section-subtitle">Transfira seus dados para outro dispositivo.</p></div><ShieldCheck size={22} className="backup-shield"/></div><div className="backup-actions"><button className="secondary-button" onClick={exportBackup}><Download size={16}/> Exportar backup</button><button className="primary-button" disabled={backupBusy} onClick={()=>backupInputRef.current?.click()}><Upload size={16}/> {backupBusy?"Importando...":"Importar backup"}</button><input ref={backupInputRef} type="file" accept=".json,application/json" className="backup-file-input" onChange={e=>void importBackup(e.target.files?.[0])}/></div><p className="helper-text">O arquivo inclui aplicações, planos, substâncias e locais. A importação substitui os dados atuais após confirmação.</p>{backupMessage&&<p className="backup-message" role="status">{backupMessage}</p>}</section>
+      <section className="card backup-tools more-backup-card">
+        <button type="button" className="more-management-heading more-management-toggle" aria-expanded={backupExpanded} onClick={()=>setBackupExpanded(v=>!v)}>
+          <div className="more-management-icon"><ShieldCheck size={20}/></div>
+          <div className="more-management-title"><h3>Backup e transferência</h3><p className="section-subtitle">Transfira seus dados para outro dispositivo.</p></div>
+          <ChevronDown className={`collapse-chevron ${backupExpanded?"expanded":""}`} size={20}/>
+        </button>
+        {backupExpanded && <>
+          <div className="backup-actions"><button className="secondary-button" onClick={exportBackup}><Download size={16}/> Exportar backup</button><button className="primary-button" disabled={backupBusy} onClick={()=>backupInputRef.current?.click()}><Upload size={16}/> {backupBusy?"Importando...":"Importar backup"}</button><input ref={backupInputRef} type="file" accept=".json,application/json" className="backup-file-input" onChange={e=>void importBackup(e.target.files?.[0])}/></div>
+          <p className="helper-text">Vai trocar de celular? No aparelho antigo, toque em Exportar backup para salvar seus dados. Depois, no aparelho novo, entre na sua conta e toque em Importar backup. O login não transfere seus dados automaticamente. Guarde o arquivo em um local seguro.</p>
+          <p className="helper-text">A importação substitui os dados atuais após confirmação.</p>
+          {backupMessage&&<p className="backup-message" role="status">{backupMessage}</p>}
+        </>}
+      </section>
+      <section className="card theme-settings-card">
+        <div className="theme-settings-copy"><div className="more-management-icon">{theme === "light" ? <Sun size={20}/> : <Moon size={20}/>}</div><div><h3>Aparência</h3><p className="section-subtitle">Escolha entre o modo claro e o modo escuro.</p></div></div>
+        <div className="theme-choice-row"><button type="button" className={`theme-choice ${theme === "light" ? "selected" : ""}`} aria-pressed={theme === "light"} onClick={() => setTheme("light")}><Sun size={17}/> Claro</button><button type="button" className={`theme-choice ${theme === "dark" ? "selected" : ""}`} aria-pressed={theme === "dark"} onClick={() => setTheme("dark")}><Moon size={17}/> Escuro</button></div>
+      </section>
       <section className="card more-account-card"><div className="dashboard-heading"><div><h3>Conta</h3><p className="section-subtitle">Conectado como {authUser.email}. Saia apenas quando precisar acessar outra conta.</p></div></div><button className="secondary-button more-signout-button" onClick={()=>signOut(firebaseAuth)}><LogOut size={16}/> Sair da conta</button></section>
     </section>
 

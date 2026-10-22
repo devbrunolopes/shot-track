@@ -6,8 +6,8 @@ export const metadata: Metadata = {
   title: "Diário Fitness",
   description: "Sua rotina. Sua evolução.",
   applicationName: "Diário Fitness",
-  themeColor: "#C5A12B",
-  appleWebApp: { capable: true, statusBarStyle: "black-translucent", title: "Diário Fitness" },
+  themeColor: "#050505",
+  appleWebApp: { capable: true, statusBarStyle: "black", title: "Diário Fitness" },
   icons: { icon: "/icons/shot-track-192.png", apple: "/icons/shot-track-192.png" },
   formatDetection: { telephone: false }
 };

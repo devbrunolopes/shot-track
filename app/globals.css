@@ -1363,9 +1363,9 @@ body { background: var(--background); color: var(--foreground); }
 .auth-shell { min-height:100dvh; display:flex; align-items:center; justify-content:center; padding:24px 16px; background:radial-gradient(ellipse at top, #29251b 0%, #111111 54%, #090909 100%); color:#111827; }
 .auth-card { width:100%; max-width:420px; border:1px solid rgba(198,164,92,.38); border-radius:24px; padding:30px; background:rgba(24,24,22,.97); box-shadow:0 24px 70px rgba(0,0,0,.42); }
 .auth-logo { display:block; width:76px; height:76px; object-fit:cover; border-radius:18px; border:1px solid #3b82f6; margin:0 auto 14px; }
-.auth-brand-title { text-align:center; font-weight:900; letter-spacing:.18em; font-size:18px; color:#d7b86b; }
+.auth-brand-title { text-align:center; font-weight:900; letter-spacing:.18em; font-size:18px; color:#ffffff; }
 .auth-subtitle { margin:7px 0 26px; text-align:center; color:#a9a396; font-size:12px; }
-.auth-title { margin:0; font-size:23px; line-height:1.25; font-weight:800; letter-spacing:-.035em; color:#111827; }
+.auth-title { margin:0; font-size:23px; line-height:1.25; font-weight:800; letter-spacing:-.035em; color:#ffffff; }
 .auth-description { margin:8px 0 22px; color:#94a3b8; font-size:13px; line-height:1.5; }
 .auth-form { display:flex; flex-direction:column; gap:16px; }
 .auth-field { display:flex; flex-direction:column; gap:8px; color:#d9d0bc; font-size:12px; font-weight:700; }
@@ -2433,3 +2433,51 @@ html[data-theme="dark"] .calendar-week-nav .active svg {
     border-radius: 10px;
   }
 }
+
+
+/* v1.14.1 — identidade preto e dourado: remove azul dos ícones e da navegação */
+:root {
+  color-scheme: dark;
+  --accent: #D4B13E;
+  --brand-blue: #D4B13E;
+  --brand-blue-light: #F5D76E;
+  --surface-raised: #171510;
+}
+html, body, .app-shell, .auth-shell {
+  accent-color: #D4B13E;
+}
+/* Ícones informativos que ainda herdavam a paleta azul */
+.plan-meta-lines span svg,
+.planned-meta > span svg,
+.history-meta-lines span svg,
+.day-record-meta-lines span svg,
+.auth-local-note svg,
+.plan-icon, .history-icon, .more-management-icon,
+.history-dose, .day-record-volume, .day-record-dose,
+.more-group-title, .next-app-kicker {
+  color: #D4B13E !important;
+}
+/* Elementos ativos e controles do app em dourado, sem azul residual */
+.brand-mark { border-color: #D4B13E !important; color: #D4B13E !important; }
+.primary-button, .auth-submit { background: #D4B13E !important; border-color: #D4B13E !important; color: #111111 !important; }
+.primary-button:hover, .auth-submit:hover { background: #E4C65B !important; }
+.calendar-day.today:not(.selected) { border-color: #D4B13E !important; color: #F5D76E !important; }
+.calendar-day.selected, .segmented button.active, .weekday-picker button.selected {
+  background: #D4B13E !important; border-color: #D4B13E !important; color: #111111 !important;
+}
+.calendar-day.selected svg, .calendar-day.active svg,
+.calendar-week-nav .active svg { color: #111111 !important; }
+.mobile-tabbar, .bottom-nav { background: #050505 !important; border-color: #302817 !important; }
+.mobile-tabbar button.active, .bottom-nav button.active { background: #292516 !important; color: #F5D76E !important; }
+.mobile-tabbar button.active svg, .bottom-nav button.active svg { color: #F5D76E !important; }
+.auth-logo { border-color: #D4B13E !important; }
+.auth-brand-title, .auth-text-button, a { color: #F5D76E !important; }
+.auth-spinner { border-top-color: #D4B13E !important; }
+.input:focus, .select:focus, .textarea:focus, .auth-field input:focus {
+  border-color: #D4B13E !important; box-shadow: 0 0 0 3px rgba(212,177,62,.18) !important;
+}
+
+
+/* v1.14.2 — King Shape icon identity and authentication contrast */
+.auth-brand-title { color: #ffffff !important; }
+.auth-title { color: #ffffff !important; }
