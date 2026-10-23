@@ -2005,7 +2005,10 @@ html[data-theme="light"] .auth-submit,
 html[data-theme="light"] .more-add-form .primary-button,
 html[data-theme="light"] .calendar-day.selected,
 html[data-theme="light"] .calendar-day.active,
-html[data-theme="light"] .calendar-mark.done { background:#b18b1f !important; background-image:none !important; color:#111111 !important; border-color:#8e6d10 !important; box-shadow:none !important; }
+html[data-theme="light"] .calendar-mark.done,
+html[data-theme="light"] .done-dot { background:#22C55E !important; background-image:none !important; border-color:#22C55E !important; box-shadow:none !important; }
+html[data-theme="light"] .calendar-mark.planned,
+html[data-theme="light"] .planned-dot { background:#F59E0B !important; background-image:none !important; border-color:#F59E0B !important; box-shadow:none !important; }
 html[data-theme="light"] .secondary-button,
 html[data-theme="light"] .calendar-week-nav,
 html[data-theme="light"] .calendar-week-header,
@@ -2079,7 +2082,10 @@ html[data-theme="dark"] .auth-submit,
 html[data-theme="dark"] .more-add-form .primary-button,
 html[data-theme="dark"] .calendar-day.selected,
 html[data-theme="dark"] .calendar-day.active,
-html[data-theme="dark"] .calendar-mark.done { background:#d4b13e !important; background-image:none !important; color:#111111 !important; border-color:#d4b13e !important; box-shadow:none !important; }
+html[data-theme="dark"] .calendar-mark.done,
+html[data-theme="dark"] .done-dot { background:#22C55E !important; background-image:none !important; border-color:#22C55E !important; box-shadow:none !important; }
+html[data-theme="dark"] .calendar-mark.planned,
+html[data-theme="dark"] .planned-dot { background:#F59E0B !important; background-image:none !important; border-color:#F59E0B !important; box-shadow:none !important; }
 html[data-theme="dark"] .secondary-button,
 html[data-theme="dark"] .calendar-week-nav,
 html[data-theme="dark"] .calendar-week-header,
@@ -2481,3 +2487,141 @@ html, body, .app-shell, .auth-shell {
 /* v1.14.2 — King Shape icon identity and authentication contrast */
 .auth-brand-title { color: #ffffff !important; }
 .auth-title { color: #ffffff !important; }
+
+
+/* v1.14.7 — cores exclusivas das bolinhas do calendário e restauração dos botões preto/dourado */
+/* Status das aplicações: aplicado = verde; planejado = laranja. Limitado aos marcadores/legenda. */
+.calendar-mark.done,
+.legend-dot.done-dot {
+  background-color: #22c55e !important;
+  background-image: none !important;
+}
+.calendar-mark.planned,
+.legend-dot.planned-dot {
+  background-color: #f59e0b !important;
+  background-image: none !important;
+}
+.calendar-mark {
+  display: inline-block;
+  width: 6px; height: 6px; min-width: 6px; min-height: 6px;
+  border-radius: 50%; padding: 0; border: 0;
+}
+.legend-dot {
+  display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+}
+/* Botões primários voltam ao dourado da identidade visual. Nenhum seletor genérico de status afeta botões. */
+.primary-button,
+.auth-submit,
+.more-add-form > button,
+.selected-day-header .primary-button,
+.next-app-button {
+  background: #D4B13E !important;
+  background-image: none !important;
+  border-color: #D4B13E !important;
+  color: #111111 !important;
+  box-shadow: 0 4px 12px rgba(212,177,62,.16) !important;
+}
+.primary-button:hover,
+.auth-submit:hover,
+.more-add-form > button:hover,
+.selected-day-header .primary-button:hover,
+.next-app-button:hover {
+  background: #E4C65B !important;
+  border-color: #E4C65B !important;
+}
+.secondary-button,
+.calendar-expand-button,
+.theme-choice {
+  background: #292516 !important;
+  background-image: none !important;
+  color: #F5D76E !important;
+  border: 1px solid #514522 !important;
+}
+.secondary-button:hover,
+.calendar-expand-button:hover,
+.theme-choice:hover {
+  background: #36301b !important;
+  border-color: #D4B13E !important;
+}
+.danger-button,
+button.danger-button,
+.plan-delete-button {
+  background: #351b24 !important;
+  color: #ff8b9a !important;
+  border-color: #733344 !important;
+}
+/* A seleção do dia usa dourado, mas não compartilha estilos com os marcadores de status. */
+.calendar-day.selected {
+  background: #D4B13E !important;
+  border-color: #D4B13E !important;
+  color: #111111 !important;
+  box-shadow: 0 4px 12px rgba(212,177,62,.18) !important;
+}
+.calendar-day.selected svg,
+.calendar-day.active svg { color: #111111 !important; }
+
+
+/* v1.14.8 — correção definitiva de especificidade: status do calendário não estiliza botões */
+/* A regra antiga com html[data-theme] incluía .primary-button e .auth-submit no seletor verde.
+   Estes seletores específicos garantem que os botões recuperem a identidade preto/dourado. */
+html[data-theme="light"] .primary-button,
+html[data-theme="light"] .auth-submit,
+html[data-theme="light"] .more-add-form .primary-button,
+html[data-theme="light"] .backup-actions .primary-button,
+html[data-theme="light"] .create-plan-button,
+html[data-theme="light"] .next-app-button,
+html[data-theme="dark"] .primary-button,
+html[data-theme="dark"] .auth-submit,
+html[data-theme="dark"] .more-add-form .primary-button,
+html[data-theme="dark"] .backup-actions .primary-button,
+html[data-theme="dark"] .create-plan-button,
+html[data-theme="dark"] .next-app-button {
+  background: #D4B13E !important;
+  background-color: #D4B13E !important;
+  background-image: none !important;
+  border-color: #D4B13E !important;
+  color: #111111 !important;
+  box-shadow: 0 4px 12px rgba(212,177,62,.16) !important;
+}
+html[data-theme="light"] .primary-button:hover,
+html[data-theme="light"] .auth-submit:hover,
+html[data-theme="light"] .more-add-form .primary-button:hover,
+html[data-theme="dark"] .primary-button:hover,
+html[data-theme="dark"] .auth-submit:hover,
+html[data-theme="dark"] .more-add-form .primary-button:hover {
+  background: #E4C65B !important;
+  background-color: #E4C65B !important;
+  border-color: #E4C65B !important;
+  color: #111111 !important;
+}
+/* Só os marcadores da legenda e do calendário representam status verde/laranja. */
+html[data-theme="light"] .calendar-mark.done,
+html[data-theme="light"] .legend-dot.done-dot,
+html[data-theme="dark"] .calendar-mark.done,
+html[data-theme="dark"] .legend-dot.done-dot {
+  background: #22C55E !important;
+  background-color: #22C55E !important;
+  background-image: none !important;
+  border-color: transparent !important;
+}
+html[data-theme="light"] .calendar-mark.planned,
+html[data-theme="light"] .legend-dot.planned-dot,
+html[data-theme="dark"] .calendar-mark.planned,
+html[data-theme="dark"] .legend-dot.planned-dot {
+  background: #F59E0B !important;
+  background-color: #F59E0B !important;
+  background-image: none !important;
+  border-color: transparent !important;
+}
+/* O dia selecionado não é um status; ele deve permanecer dourado. */
+html[data-theme="light"] .calendar-day.selected,
+html[data-theme="light"] .calendar-day.active,
+html[data-theme="dark"] .calendar-day.selected,
+html[data-theme="dark"] .calendar-day.active {
+  background: #D4B13E !important;
+  background-color: #D4B13E !important;
+  background-image: none !important;
+  border-color: #D4B13E !important;
+  color: #111111 !important;
+  box-shadow: 0 4px 12px rgba(212,177,62,.18) !important;
+}
